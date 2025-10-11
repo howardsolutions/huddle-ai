@@ -1,26 +1,89 @@
 "use client";
 
-import { useState } from "react";
 import { authClient } from "@/auth-client";
+import Logo from "@/components/logo";
+import { useState } from "react";
+import { z, ZodError, ZodIssue } from "zod";
+
+// Zod validation schemas
+const signInSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const signUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | undefined>("");
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    setErrors({});
+    
+    try {
+      if (isLogin) {
+        signInSchema.parse({
+          email: formData.email,
+          password: formData.password,
+        });
+      } else {
+        signUpSchema.parse(formData);
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.issues.forEach((err: ZodIssue) => {
+          if (err.path && err.path.length > 0) {
+            fieldErrors[err.path[0] as string] = err.message;
+          } else {
+            fieldErrors["general"] = "An unexpected error occurred";
+          }
+        });
+        setErrors(fieldErrors);
+      } else {
+        setErrors({ general: "An unexpected error occurred" });
+      }
+      return false;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         const { data, error } = await authClient.signIn.email({
-          email,
-          password,
+          email: formData.email,
+          password: formData.password,
         });
         
         if (error) {
@@ -31,9 +94,9 @@ export default function AuthForm() {
         }
       } else {
         const { data, error } = await authClient.signUp.email({
-          email,
-          password,
-          name,
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
         });
         
         if (error) {
@@ -52,81 +115,100 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="hero min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10">
-      <div className="hero-content flex-col lg:flex-row-reverse">
-        <div className="text-center lg:text-left">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Welcome to Huddle AI
-          </h1>
-          <p className="py-6 text-lg opacity-80">
-            Join our intelligent collaboration platform and transform the way your team works together.
-          </p>
-        </div>
-        <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-          <div className="card-body">
-            <h2 className="card-title text-2xl font-bold text-center mb-6">
-              {isLogin ? "Sign In" : "Sign Up"}
-            </h2>
-            
-            {error && (
-              <div className="alert alert-error mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{error}</span>
+    <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
+      <div className="card bg-base-100 shadow-2xl w-full max-w-4xl rounded-2xl overflow-hidden">
+        <div className="flex flex-col lg:flex-row min-h-[600px]">
+          {/* Form Section */}
+          <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center">
+            <div className="max-w-md mx-auto w-full">
+              {/* Header */}
+              <div className="text-center mb-10">
+                <h1 className="text-3xl font-bold text-base-content mb-3">
+                  {isLogin ? "Welcome back" : "Create your account"}
+                </h1>
+                <p className="text-base-content/60 text-lg">
+                  {isLogin ? "Login to your account" : "Sign up to get started"}
+                </p>
               </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">Full Name</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your full name"
-                    className="input input-bordered input-primary w-full"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required={!isLogin}
-                  />
+
+              {/* Error Message */}
+              {error && (
+                <div className="alert alert-error mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{error}</span>
                 </div>
               )}
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Email</span>
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="input input-bordered input-primary w-full"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Password</span>
-                </label>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  className="input input-bordered input-primary w-full"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="form-control mt-6">
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {!isLogin && (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-semibold text-base">Full Name</span>
+                    </label>
+                    <input
+                      type="text"
+                      className={`input input-bordered input-lg w-full focus:input-primary transition-colors ${
+                        errors.name ? 'input-error' : 'input-base-200'
+                      }`}
+                      placeholder="Enter your full name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                    />
+                    {errors.name && (
+                      <label className="label">
+                        <span className="label-text-alt text-error font-medium">{errors.name}</span>
+                      </label>
+                    )}
+                  </div>
+                )}
+                
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-base">Email</span>
+                  </label>
+                  <input
+                    type="email"
+                    className={`input input-bordered input-lg w-full focus:input-primary transition-colors ${
+                      errors.email ? 'input-error' : 'input-base-200'
+                    }`}
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                  />
+                  {errors.email && (
+                    <label className="label">
+                      <span className="label-text-alt text-error font-medium">{errors.email}</span>
+                    </label>
+                  )}
+                </div>
+                
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-base">Password</span>
+                  </label>
+                  <input
+                    type="password"
+                    className={`input input-bordered input-lg w-full focus:input-primary transition-colors ${
+                      errors.password ? 'input-error' : 'input-base-200'
+                    }`}
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                  />
+                  {errors.password && (
+                    <label className="label">
+                      <span className="label-text-alt text-error font-medium">{errors.password}</span>
+                    </label>
+                  )}
+                </div>
+                
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn btn-primary w-full"
+                  className="btn btn-primary btn-lg w-full mt-6"
                 >
                   {loading ? (
                     <>
@@ -137,19 +219,29 @@ export default function AuthForm() {
                     isLogin ? "Sign In" : "Sign Up"
                   )}
                 </button>
+              </form>
+              
+              <div className="mt-10">
+                <div className="divider text-base-content/50">Or continue with</div>
+                
+                <div className="text-center mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(!isLogin)}
+                    className="btn btn-link btn-sm text-primary hover:text-primary/80"
+                  >
+                    {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                  </button>
+                </div>
               </div>
-            </form>
-            
-            <div className="divider">OR</div>
-            
+            </div>
+          </div>
+
+          {/* Logo Section */}
+          <div className="bg-gradient-to-br from-primary to-secondary lg:w-1/2 flex items-center justify-center p-8 lg:p-12 text-primary-content">
             <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="link link-primary font-medium"
-              >
-                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-              </button>
+              <Logo variant="mark-white" className="mx-auto h-24 w-24 mb-6" />
+              <h2 className="text-2xl font-bold">Huddle AI</h2>
             </div>
           </div>
         </div>

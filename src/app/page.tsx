@@ -3,6 +3,7 @@
 
 import { useAuth } from "@/components/session-provider";
 import AuthForm from "@/components/auth-form";
+import Logo from "@/components/logo";
 
 export default function Home() {
   const { user, loading, signOut } = useAuth();
@@ -21,32 +22,33 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
       {user ? (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-12 max-w-7xl">
           {/* Hero Section */}
-          <div className="hero bg-gradient-to-r from-primary to-secondary rounded-3xl text-primary-content mb-8">
-            <div className="hero-content text-center">
-              <div className="max-w-md">
-                <h1 className="text-5xl font-bold mb-4">
-                  Welcome back, {user.name}!
-                </h1>
-                <p className="text-xl opacity-90 mb-6">
-                  Ready to collaborate and create something amazing?
-                </p>
-                <button
-                  onClick={signOut}
-                  className="btn btn-outline btn-primary-content"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Sign Out
-                </button>
+          <div className="hero bg-gradient-to-r from-primary to-secondary rounded-3xl text-primary-content mb-12 p-12">
+            <div className="hero-content text-center max-w-2xl">
+              <div className="mb-8">
+                <Logo variant="mark" className="mx-auto h-20 w-20" />
               </div>
+              <h1 className="text-4xl lg:text-6xl font-bold mb-6">
+                Welcome back, {user.name}!
+              </h1>
+              <p className="text-xl lg:text-2xl opacity-90 mb-8 leading-relaxed">
+                Ready to collaborate and create something amazing?
+              </p>
+              <button
+                onClick={signOut}
+                className="btn btn-outline btn-primary-content btn-lg px-8"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sign Out
+              </button>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <div className="stat bg-base-100 shadow-lg rounded-2xl">
               <div className="stat-figure text-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">

@@ -4,6 +4,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Huddle AI Brand Colors - Inspired by the logo */
+  --brand-primary: #6366F1;
+  --brand-secondary: #8B5CF6;
+  --brand-accent: #EC4899;
+  --brand-warning: #F59E0B;
+  --brand-neutral: #1F2937;
 }
 
 @theme inline {
@@ -11,6 +18,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+  
+  /* DaisyUI theme colors matching the logo */
+  --color-primary: var(--brand-primary);
+  --color-secondary: var(--brand-secondary);
+  --color-accent: var(--brand-accent);
+  --color-warning: var(--brand-warning);
 }
 
 @media (prefers-color-scheme: dark) {
