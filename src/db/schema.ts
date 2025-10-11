@@ -1,13 +1,13 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, foreignKey } from "drizzle-orm/pg-core";
 
 // For user management
-export const users = pgTable("user", {
+export const users = pgTable("users", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  name: text("name"),
+  email: text("email"),
+  createdAt: timestamp("created_at").defaultNow(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
@@ -21,7 +21,12 @@ export const sessions = pgTable("session", {
   ipAddress: text("ipAddress"),
   userAgent: text("userAgent"),
   userId: text("userId").notNull(),
-});
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+  }),
+}));
 
 // For social login 
 export const accounts = pgTable("account", {
@@ -38,7 +43,12 @@ export const accounts = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+  }),
+}));
 
 // For email verification
 export const verifications = pgTable("verification", {
