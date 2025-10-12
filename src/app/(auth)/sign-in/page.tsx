@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@/auth-client";
+import { authClient, signInWithGithub, signInWithGoogle } from "@/auth-client";
 import {
   AuthButton,
   AuthLayout,
@@ -11,14 +11,23 @@ import {
   signInSchema,
   type SignInFormData
 } from "@/modules/auth/ui";
+import { useAuth } from "@/components/session-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function SignInPage() {
   const router = useRouter();
   const [error, setError] = useState<string>("");
+  const { user, loading } = useAuth();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
 
   const {
     register,
@@ -36,14 +45,14 @@ export default function SignInPage() {
       const { data: result, error } = await authClient.signIn.email({
         email: data.email,
         password: data.password,
+        callbackURL: "/", // Better Auth will handle the redirect
       });
       
       if (error) {
         setError(error.message || "An unexpected error occurred");
       } else {
         console.log("Login successful:", result);
-        // Redirect to dashboard or home page
-        router.push("/");
+        // Better Auth will handle the redirect automatically
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -51,15 +60,43 @@ export default function SignInPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth login
-    console.log("Google login clicked");
+  const handleGoogleLogin = async () => {
+    setError("");
+    try {
+      await signInWithGoogle({
+        callbackURL: "/", // Redirect to home page after successful login
+      });
+    } catch (err) {
+      setError("Failed to sign in with Google");
+      console.error("Google login error:", err);
+    }
   };
 
-  const handleGithubLogin = () => {
-    // TODO: Implement Github OAuth login
-    console.log("Github login clicked");
+  const handleGithubLogin = async () => {
+    setError("");
+    try {
+      await signInWithGithub({
+        callbackURL: "/", // Redirect to home page after successful login
+      });
+    } catch (err) {
+      setError("Failed to sign in with GitHub");
+      console.error("GitHub login error:", err);
+    }
   };
+
+  // Show loading while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  // Don't render if user is logged in (redirect will happen)
+  if (user) {
+    return null;
+  }
 
   return (
     <AuthLayout

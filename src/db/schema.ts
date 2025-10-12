@@ -4,7 +4,7 @@ import { boolean, pgTable, text, timestamp, foreignKey } from "drizzle-orm/pg-co
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name"),
-  email: text("email"),
+  email: text("email").unique(),
   createdAt: timestamp("created_at").defaultNow(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),

@@ -39,8 +39,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data } = await authClient.getSession();
         if (data?.session && data?.user) {
-          setSession(data);
-          setUser(data.user);
+          setSession(data as Session);
+          setUser(data.user as User);
         }
       } catch (error) {
         console.error("Error getting session:", error);
