@@ -10,7 +10,7 @@ export const auth = betterAuth({
       user: schema.users,
       session: schema.sessions,
       account: schema.accounts,
-      verification_token: schema.verifications,
+      verification: schema.verifications,
     },
   }),
   secret: process.env.BETTER_AUTH_SECRET!, // Required for JWT signing and session security
