@@ -17,8 +17,8 @@
     <path d="M30 50 L35 55 L40 50" stroke="#F59E0B" stroke-width="2" fill="none"/>
   </g>
   
-  <!-- Logo Text - Centered as a group -->
-  <g id="logo-text" transform="translate(60, 30)">
+  <!-- Logo Text - Vertically aligned with logo mark -->
+  <g id="logo-text" transform="translate(60, 37.5)">
     <text y="-6" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#1F2937" text-anchor="start" dominant-baseline="middle">Huddle</text>
     <text y="8" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500" fill="#6366F1" text-anchor="start" dominant-baseline="middle">AI</text>
   </g>
