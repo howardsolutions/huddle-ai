@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { DashboardContent } from "./dashboard-content";
+import { DashboardNavbar } from "./dashboard-navbar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -18,30 +19,56 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, user, onSignOut }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    // Check on mount
+    checkIsMobile();
+
+    // Add event listener
+    window.addEventListener('resize', checkIsMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  const toggleSidebar = () => {
+    // On mobile, toggle the sidebar open/closed state
+    // On desktop, toggle the collapsed state
+    if (isMobile) {
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
 
   return (
-    <div className="bg-gray-50 flex">
+    <div className="bg-gray-50 min-h-screen">
       {/* Sidebar */}
       <DashboardSidebar 
         isOpen={sidebarOpen} 
+        isCollapsed={sidebarCollapsed}
         onClose={() => setSidebarOpen(false)}
         user={user}
         onSignOut={onSignOut}
       />
 
       {/* Main Content Area */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
-        {/* Mobile Header */}
-        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ${
+        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+      }`}>
+        {/* Navbar */}
+        <DashboardNavbar 
+          onToggleSidebar={toggleSidebar}
+          isSidebarCollapsed={sidebarCollapsed}
+          isMobile={isMobile}
+          isSidebarOpen={sidebarOpen}
+        />
 
         {/* Content */}
         <DashboardContent>

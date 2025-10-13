@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
+  isCollapsed?: boolean;
   onClose: () => void;
   user: {
     id: string;
@@ -41,7 +42,7 @@ const navigationItems = [
   },
 ];
 
-export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: DashboardSidebarProps) {
+export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, onSignOut }: DashboardSidebarProps) {
   const dropdownRef = useRef<HTMLDetailsElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -85,16 +86,23 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 h-screen bg-gradient-to-b from-primary/95 to-secondary/95 backdrop-blur-lg
-        transform transition-transform duration-300 ease-in-out
-        lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 h-screen bg-gradient-to-b from-primary/95 to-secondary/95 backdrop-blur-lg
+        transform transition-all duration-300 ease-in-out
+        lg:translate-x-0 lg:fixed lg:inset-y-0 lg:left-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${isCollapsed ? 'w-16' : 'w-64'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
-            <div className="flex items-center justify-center space-x-3">
-              <Logo variant="auth" className="h-[5rem] w-[15rem] text-white" />
+          <div className={`flex items-center justify-between border-b border-white/10 ${
+            isCollapsed ? 'px-2 py-4' : 'px-6 py-6'
+          }`}>
+            <div className="flex items-center justify-center">
+              {isCollapsed ? (
+                <Logo variant="mark" className="text-white" />
+              ) : (
+                <Logo variant="auth" className="h-[5rem] w-[15rem] text-white" />
+              )}
             </div>
             <button
               onClick={onClose}
@@ -107,63 +115,76 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6">
+          <nav className={`flex-1 py-6 ${isCollapsed ? 'px-2' : 'px-4'}`}>
             {navigationItems.map((item, index) => (
               <div key={item.id} className={index > 0 ? "mt-2" : ""}>
                 <DashboardNavItem
                   {...item}
+                  isCollapsed={isCollapsed}
                 />
               </div>
             ))}
           </nav>
 
           {/* User Profile Section */}
-          <div className="p-6 border-t border-white/10">
-            <details ref={dropdownRef} className="dropdown dropdown-top w-full [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
-              <summary className="w-full justify-start bg-transparent hover:bg-white/10 border-none p-3 h-auto cursor-pointer focus:outline-none rounded-lg">
-                <div className="flex items-center space-x-3 w-full">
-                  <Avatar user={user} size="md" />
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-white font-medium text-sm truncate">{user.name}</p>
-                    <p className="text-white/70 text-xs truncate">{user.email}</p>
+          <div className={`border-t border-white/10 ${isCollapsed ? 'p-2' : 'p-6'}`}>
+            {isCollapsed ? (
+              <div className="flex justify-center">
+                <Avatar user={user} size="sm" />
+              </div>
+            ) : (
+              <details ref={dropdownRef} className="dropdown dropdown-top w-full [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
+                <summary className="w-full justify-start bg-transparent hover:bg-white/10 border-none p-3 h-auto cursor-pointer focus:outline-none rounded-lg">
+                  <div className="flex items-center space-x-3 w-full">
+                    <Avatar user={user} size="md" />
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-white font-medium text-sm truncate">{user.name}</p>
+                      <p className="text-white/70 text-xs truncate">{user.email}</p>
+                    </div>
+                    <svg 
+                      className={`h-4 w-4 text-white/70 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
-                  <svg 
-                    className={`h-4 w-4 text-white/70 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
+                </summary>
+                <div className="dropdown-content bg-white rounded-lg shadow-xl border border-gray-200 w-64 p-0 mt-2 sm:w-72">
+                  {/* User Info Header */}
+                  <div className="px-4 py-4 border-b border-gray-100 sm:px-6">
+                    <p className="font-semibold text-gray-900 text-base sm:text-lg">{user.name}</p>
+                    <p className="text-gray-600 text-sm mt-1">{user.email}</p>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        // TODO: Navigate to billing page
+                      }}
+                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-150"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                      <span className="font-medium">Billing</span>
+                    </button>
+                    
+                    <button
+                      onClick={onSignOut}
+                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </div>
                 </div>
-              </summary>
-              <ul className="dropdown-content menu bg-white/95 backdrop-blur-sm rounded-box w-52 p-2 shadow-lg border border-white/20">
-                <li>
-                  <button
-                    onClick={() => {
-                      // TODO: Navigate to billing page
-                    }}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-primary hover:bg-primary/10"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
-                    <span className="text-sm font-medium">Billing</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={onSignOut}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span className="text-sm font-medium">Sign Out</span>
-                  </button>
-                </li>
-              </ul>
-            </details>
+              </details>
+            )}
           </div>
         </div>
       </div>
