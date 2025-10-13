@@ -5,6 +5,7 @@ import Logo from "@/components/logo";
 import { Avatar } from "@/components/avatar";
 import { MdVideoCall, MdSmartToy, MdUpgrade } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -26,7 +27,6 @@ const navigationItems = [
     label: "Meetings",
     href: "/meetings",
     icon: <MdVideoCall className="h-5 w-5" />,
-    isActive: true,
   },
   {
     id: "agents",
@@ -45,6 +45,7 @@ const navigationItems = [
 export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, onSignOut }: DashboardSidebarProps) {
   const dropdownRef = useRef<HTMLDetailsElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,14 +117,18 @@ export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, o
 
           {/* Navigation */}
           <nav className={`flex-1 py-6 ${isCollapsed ? 'px-2' : 'px-4'}`}>
-            {navigationItems.map((item, index) => (
-              <div key={item.id} className={index > 0 ? "mt-2" : ""}>
-                <DashboardNavItem
-                  {...item}
-                  isCollapsed={isCollapsed}
-                />
-              </div>
-            ))}
+            {navigationItems.map((item, index) => {
+              const isActive = pathname === item.href;
+              return (
+                <div key={item.id} className={index > 0 ? "mt-2" : ""}>
+                  <DashboardNavItem
+                    {...item}
+                    isActive={isActive}
+                    isCollapsed={isCollapsed}
+                  />
+                </div>
+              );
+            })}
           </nav>
 
           {/* User Profile Section */}
