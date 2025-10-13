@@ -11,19 +11,6 @@ export default function Logo({ variant = "full", className = '' }: LogoProps) {
     ? `${baseClasses} ${className}`
     : baseClasses;
 
-  if (variant === "mark") {
-    return (
-      <Image
-        src="/huddle-ai-logo-mark.svg"
-        alt="Huddle AI"
-        width={48}
-        height={48}
-        className={combinedClassName}
-        priority
-      />
-    );
-  }
-
   if (variant === "auth") {
     return (
       <Image

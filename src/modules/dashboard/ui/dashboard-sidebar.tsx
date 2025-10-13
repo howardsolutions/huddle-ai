@@ -3,6 +3,7 @@
 import { DashboardNavItem } from "./dashboard-nav-item";
 import Logo from "@/components/logo";
 import { MdVideoCall, MdSmartToy, MdUpgrade } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -39,6 +40,37 @@ const navigationItems = [
 ];
 
 export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: DashboardSidebarProps) {
+  const dropdownRef = useRef<HTMLDetailsElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        dropdownRef.current.open = false;
+        setIsDropdownOpen(false);
+      }
+    };
+
+    const handleToggle = () => {
+      if (dropdownRef.current) {
+        setIsDropdownOpen(dropdownRef.current.open);
+      }
+    };
+
+    const dropdown = dropdownRef.current;
+    if (dropdown) {
+      dropdown.addEventListener('toggle', handleToggle);
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (dropdown) {
+        dropdown.removeEventListener('toggle', handleToggle);
+      }
+    };
+  }, []);
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -85,27 +117,55 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
 
           {/* User Profile Section */}
           <div className="p-6 border-t border-white/10">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm truncate">{user.name}</p>
-                <p className="text-white/70 text-xs truncate">{user.email}</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={onSignOut}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors duration-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span className="text-sm font-medium">Sign Out</span>
-            </button>
+            <details ref={dropdownRef} className="dropdown dropdown-top w-full [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
+              <summary className="w-full justify-start bg-transparent hover:bg-white/10 border-none p-0 h-auto cursor-pointer focus:outline-none">
+                <div className="flex items-center space-x-3 w-full">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium text-sm">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-white font-medium text-sm truncate">{user.name}</p>
+                    <p className="text-white/70 text-xs truncate">{user.email}</p>
+                  </div>
+                  <svg 
+                    className={`h-4 w-4 text-white/70 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </summary>
+              <ul className="dropdown-content menu bg-white/95 backdrop-blur-sm rounded-box w-52 p-2 shadow-lg border border-white/20">
+                <li>
+                  <button
+                    onClick={() => {
+                      // TODO: Navigate to billing page
+                    }}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-primary hover:bg-primary/10"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    <span className="text-sm font-medium">Billing</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={onSignOut}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span className="text-sm font-medium">Sign Out</span>
+                  </button>
+                </li>
+              </ul>
+            </details>
           </div>
         </div>
       </div>

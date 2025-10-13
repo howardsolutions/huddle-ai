@@ -18,6 +18,11 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Huddle AI - Intelligent Collaboration Platform",
   description: "Transform the way your team works together with our intelligent collaboration platform",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
