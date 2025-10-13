@@ -106,7 +106,7 @@ export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, o
             </div>
             <button
               onClick={onClose}
-              className="lg:hidden text-white/70 hover:text-white transition-colors"
+              className="btn btn-ghost btn-sm lg:hidden text-white/70 hover:text-white"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -164,7 +164,7 @@ export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, o
                       onClick={() => {
                         // TODO: Navigate to billing page
                       }}
-                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-150"
+                      className="btn btn-ghost w-full justify-start gap-3"
                     >
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -174,7 +174,7 @@ export function DashboardSidebar({ isOpen, isCollapsed = false, onClose, user, o
                     
                     <button
                       onClick={onSignOut}
-                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-150"
+                      className="btn btn-ghost w-full justify-start gap-3 text-error hover:bg-error/10 hover:text-error"
                     >
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { DashboardContent } from "./dashboard-content";
 import { DashboardNavbar } from "./dashboard-navbar";
+import { CommandPalette } from "@/components/command-palette";
+import { useCommandPalette } from "@/hooks";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,6 +23,7 @@ export function DashboardLayout({ children, user, onSignOut }: DashboardLayoutPr
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const commandPalette = useCommandPalette();
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -68,6 +71,7 @@ export function DashboardLayout({ children, user, onSignOut }: DashboardLayoutPr
           isSidebarCollapsed={sidebarCollapsed}
           isMobile={isMobile}
           isSidebarOpen={sidebarOpen}
+          onOpenSearch={commandPalette.open}
         />
 
         {/* Content */}
@@ -75,6 +79,12 @@ export function DashboardLayout({ children, user, onSignOut }: DashboardLayoutPr
           {children}
         </DashboardContent>
       </div>
+
+      {/* Command Palette */}
+      <CommandPalette 
+        isOpen={commandPalette.isOpen}
+        onClose={commandPalette.close}
+      />
     </div>
   );
 }
