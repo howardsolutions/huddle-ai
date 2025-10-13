@@ -68,6 +68,7 @@ interface DashboardStatsProps {
     name: string;
     email: string;
     emailVerified: boolean;
+    image?: string;
   };
 }
 

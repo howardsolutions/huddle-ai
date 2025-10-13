@@ -11,6 +11,7 @@ interface DashboardLayoutProps {
     name: string;
     email: string;
     emailVerified: boolean;
+    image?: string;
   };
   onSignOut: () => void;
 }

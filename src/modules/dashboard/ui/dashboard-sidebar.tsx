@@ -2,6 +2,7 @@
 
 import { DashboardNavItem } from "./dashboard-nav-item";
 import Logo from "@/components/logo";
+import { Avatar } from "@/components/avatar";
 import { MdVideoCall, MdSmartToy, MdUpgrade } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,6 +14,7 @@ interface DashboardSidebarProps {
     name: string;
     email: string;
     emailVerified: boolean;
+    image?: string;
   };
   onSignOut: () => void;
 }
@@ -118,13 +120,9 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
           {/* User Profile Section */}
           <div className="p-6 border-t border-white/10">
             <details ref={dropdownRef} className="dropdown dropdown-top w-full [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
-              <summary className="w-full justify-start bg-transparent hover:bg-white/10 border-none p-0 h-auto cursor-pointer focus:outline-none">
+              <summary className="w-full justify-start bg-transparent hover:bg-white/10 border-none p-3 h-auto cursor-pointer focus:outline-none rounded-lg">
                 <div className="flex items-center space-x-3 w-full">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
+                  <Avatar user={user} size="md" />
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-white font-medium text-sm truncate">{user.name}</p>
                     <p className="text-white/70 text-xs truncate">{user.email}</p>

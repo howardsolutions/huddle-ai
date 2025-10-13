@@ -6,6 +6,7 @@ interface DashboardProfileCardProps {
     name: string;
     email: string;
     emailVerified: boolean;
+    image?: string;
   };
 }
 
