@@ -14,7 +14,7 @@ export function DashboardNavItem({ label, href, icon, isActive = false }: Dashbo
   return (
     <Link href={href}>
       <div className={`
-        flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
+        flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group relative
         ${isActive 
           ? 'bg-white/20 text-white shadow-lg' 
           : 'text-white/80 hover:text-white hover:bg-white/10'

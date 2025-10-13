@@ -59,9 +59,8 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
-            <div className="flex items-center space-x-3">
-              <Logo variant="mark" className="h-8 w-8 text-white" />
-              <span className="text-xl font-semibold text-white">Huddle AI</span>
+            <div className="flex items-center justify-center space-x-3">
+              <Logo variant="auth" className="h-[5rem] w-[15rem] text-white" />
             </div>
             <button
               onClick={onClose}
@@ -74,12 +73,13 @@ export function DashboardSidebar({ isOpen, onClose, user, onSignOut }: Dashboard
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1">
-            {navigationItems.map((item) => (
-              <DashboardNavItem
-                key={item.id}
-                {...item}
-              />
+          <nav className="flex-1 px-4 py-6">
+            {navigationItems.map((item, index) => (
+              <div key={item.id} className={index > 0 ? "mt-2" : ""}>
+                <DashboardNavItem
+                  {...item}
+                />
+              </div>
             ))}
           </nav>
 
