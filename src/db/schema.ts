@@ -1,4 +1,5 @@
 import { boolean, pgTable, text, timestamp, foreignKey } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 // For user management
 export const users = pgTable("users", {
@@ -58,4 +59,14 @@ export const verifications = pgTable("verification", {
   expiresAt: timestamp("expiresAt").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+// For AI agents
+export const agents = pgTable("agents", {
+  id: text("id").primaryKey().$defaultFn(() => nanoid()),
+  name: text("name").notNull(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  instructions: text("instructions").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
